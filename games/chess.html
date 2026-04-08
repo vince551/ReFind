@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Joboteen Theme Integration */
+        :root {
+            --bg: #0f172a;
+            --accent: #a855f7; /* Purple from your main site */
+            --primary: #06b6d4; /* Cyan from your main site */
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background: transparent; /* Allows main site bg to show */
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+        }
+        .square { width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: pointer; }
+        .white { background-color: rgba(255,255,255,0.1); }
+        .black { background-color: rgba(0,0,0,0.3); }
+        .selected { background-color: var(--accent) !important; }
+        #status { color: var(--primary); font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-shine {
+            background: var(--primary);
+            border: none;
+            padding: 8px 20px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">White's Turn</div>
+    <div id="board"></div>
+    <button class="btn-shine" onclick="location.reload()">Restast game</button>
+
+    <script>
+        // Your existing Chess Logic
+        const pieces = { r:'♜', n:'♞', b:'♝', q:'♛', k:'♚', p:'♟', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔', P:'♙' };
+        const boardLayout = [
+            ['r','n','b','q','k','b','n','r'], ['p','p','p','p','p','p','p','p'],
+            ['','','','','','','',''], ['','','','','','','',''],
+            ['','','','','','','',''], ['','','','','','','',''],
+            ['P','P','P','P','P','P','P','P'], ['R','N','B','Q','K','B','N','R']
+        ];
+        let selectedSquare = null;
+        let turn = 'white';
+
+        function createBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+                    const pieceCode = boardLayout[row][col];
+                    if (pieceCode) {
+                        square.textContent = pieces[pieceCode];
+                        square.style.color = pieceCode === pieceCode.toUpperCase() ? '#fff' : '#a855f7';
+                    }
+                    square.onclick = () => handleSquareClick(row, col);
+                    boardElement.appendChild(square);
+                }
+            }
+        }
+
+        function handleSquareClick(row, col) {
+            const piece = boardLayout[row][col];
+            const color = piece ? (piece === piece.toUpperCase() ? 'white' : 'black') : null;
+            if (selectedSquare) {
+                boardLayout[row][col] = boardLayout[selectedSquare.row][selectedSquare.col];
+                boardLayout[selectedSquare.row][selectedSquare.col] = '';
+                turn = turn === 'white' ? 'black' : 'white';
+                document.getElementById('status').textContent = `${turn}'s Turn`;
+                selectedSquare = null;
+                createBoard();
+            } else if (piece && color === turn) {
+                selectedSquare = { row, col };
+                createBoard();
+                document.getElementById('board').children[row * 8 + col].classList.add('selected');
+            }
+        }
+        createBoard();
+    </script>
+</body>
+</html>

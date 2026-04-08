@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Joboteen Admin | Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Admin-specific overrides */
+        .admin-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .request-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+        .status-badge { float: right; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; background: var(--primary); }
+    </style>
+</head>
+<body class="admin-body">
+
+    <div id="main-app" style="display: flex;">
+<aside class="sidebar">
+    <div class="sidebar-header" style="padding: 20px; text-align: center;">
+        <h2 style="color: var(--accent); letter-spacing: 2px; font-size: 1.2rem;">ADMIN_DASH</h2>
+        <div style="font-size: 0.6rem; color: #00ff00; opacity: 0.8;">● SYSTEM_ACTIVE</div>
+    </div>
+
+    <nav class="admin-nav" style="flex: 1;">
+        <div class="nav-item active" onclick="setAdminView('overview', this)">
+            <span>📊</span> <span class="nav-text">Overview</span>
+        </div>
+        <div class="nav-item" onclick="setAdminView('mentor-mgmt', this)">
+            <span>👥</span> <span class="nav-text">Add Mentors</span>
+        </div>
+        <div class="nav-item" onclick="setAdminView('broadcast', this)">
+            <span>📡</span> <span class="nav-text">Send Notification</span>
+        </div>
+        <div class="nav-item" onclick="setAdminView('inbox', this)">
+            <span>📥</span> <span class="nav-text">User Messages</span>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid #222;">
+        <a href="index.html" class="exit-link">
+            <span>🚀</span> <span class="nav-text">Back to teens
+            </span>
+        </a>
+    </div>
+</aside>
+
+<main class="content">
+<section id="overview" class="view active-view">
+    <h1 class="terminal-title">Platform Statistics</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card glass-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-data">
+                <span class="stat-num counter">1,042</span>
+                <span class="stat-label">Total Teens</span>
+            </div>
+            <div class="stat-trend">+12% this week</div>
+        </div>
+
+        <div class="stat-card glass-card">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-data">
+                <span class="stat-num">15</span>
+                <span class="stat-label">Active Mentors</span>
+            </div>
+            <div class="stat-trend pulse-cyan">All Systems Nominal</div>
+        </div>
+
+        <div class="stat-card glass-card">
+            <div class="stat-icon">📡</div>
+            <div class="stat-data">
+                <span class="stat-num live-glow">312</span>
+                <span class="stat-label">Live Today</span>
+            </div>
+            <div class="stat-trend">Real-time Feed</div>
+        </div>
+    </div>
+</section>
+
+
+<section id="mentor-mgmt" class="view">
+    <div class="login-card glass-card" style="max-width: 450px; margin: 0 auto; padding: 40px;">
+        <h2 style="color: var(--accent); margin-top: 0;">Register New Mentor</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">Enter professional credentials below.</p>
+
+        <div class="photo-upload-container" onclick="document.getElementById('m-file').click()">
+            <div id="photo-preview" class="photo-preview-box">
+                <span>Click to Upload Photo</span>
+            </div>
+            <input type="file" id="m-file" accept="image/*" style="display: none;" onchange="previewImage(this)">
+        </div>
+
+ <div class="input-field">
+    <input type="text" id="m-name" required>
+    <label>Full Name</label>
+</div>
+
+<div class="input-field">
+    <input type="text" id="m-edu" required>
+    <label>Level of Education</label>
+</div>
+
+<div class="input-field">
+    <input type="number" id="m-age" required>
+    <label>Age</label>
+</div>
+
+<div class="control-group">
+    <label class="control-label">Expertise Category</label>
+    <select id="m-category" class="neon-select">
+        <option value="Tech">Technology</option>
+        <option value="Art">Creative Arts</option>
+        <option value="Business">Business</option>
+        <option value="Science">Science</option>
+    </select>
+</div>
+        <button class="btn-shine" onclick="registerMentor()" style="margin-top: 20px;">Deploy Mentor to teens</button>
+    </div>
+
+<div class="glass-card" style="margin-top: 20px;">
+    <h3>Active Mentors List</h3>
+    <div id="admin-mentor-list">
+        </div>
+</div>
+</section>
+
+
+
+<section id="inbox" class="view">
+    <h1>Incoming Guidance Requests</h1>
+    <div id="admin-request-list">
+         <p style="color: #555;">Waiting for new requests...</p>
+    </div>
+</section>
+
+<section id="broadcast" class="view">
+    <div class="admin-card transmission-deck">
+        <div class="deck-header">
+            <h1 class="cyan-text">NOTIFY THE TEENS</h1>
+            <p style="color: #666; font-size: 0.8rem;">Broadcast news or alerts to all active neural links.</p>
+        </div>
+
+        <div class="terminal-body">
+            <div class="input-block">
+                <label>TRANSMISSION CONTENT</label>
+                <textarea id="broadcast-msg" class="admin-input" placeholder="Type news update or notification..."></textarea>
+            </div>
+
+            <div class="admin-grid-2">
+                <div class="input-block">
+                    <label>SIGNAL PRIORITY</label>
+                    <select id="broadcast-type" class="admin-input">
+                        <option value="info">STANDARD (CYAN)</option>
+                        <option value="urgent">URGENT (PURPLE)</option>
+                        <option value="emergency">CRITICAL (RED)</option>
+                    </select>
+                </div>
+                
+                <div class="input-block">
+                    <label>TARGET AUDIENCE</label>
+                    <div class="static-value">ALL ACTIVE TEENS</div>
+                </div>
+            </div>
+
+            <button class="btn-shine broadcast-btn" onclick="sendGlobalAlert()">
+                <span>📡</span> EXECUTE BROADCAST
+            </button>
+        </div>
+        
+        <div class="transmission-status">
+            <span class="pulse-dot"></span> SATELLITE_LINK_STABLE
+        </div>
+    </div>
+</section>
+        </main>
+    </div>
+
+    <script src="admin-logic.js"></script>
+</body>
+</html>
