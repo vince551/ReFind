@@ -2,49 +2,85 @@
 
 **Find it. Recover it. Protect it.**
 
-ReFind is a privacy-first lost-device recovery project by **Vince Odhiambo**. The goal is simple: register your own phone before an event, trip, school day or everyday use, then use another device to access a secure recovery dashboard when it goes missing.
+ReFind is a privacy-first lost-device recovery platform by **Vince Odhiambo**. The idea came from a real problem: a phone can disappear at an event and the owner may have no practical recovery tool ready.
 
-## Current MVP
+## Architecture
 
-- Responsive recovery dashboard
-- Device registration flow
-- Browser geolocation permission and latest-location capture
-- Battery information when supported by the browser
-- Lost Mode state
-- Ring/recovery action placeholder for the future companion app
-- PWA manifest, service worker and install prompt
-- Offline-friendly shell
-- Clear security/permission boundaries
-
-### Important limitation
-
-The current GitHub Pages MVP stores its demo state locally in the browser. A web page cannot reliably locate a separate lost phone by itself, bypass Android/iOS permissions, or locate a powered-off device.
-
-## Next build phases
-
-1. **Authenticated cloud backend** — accounts, device ownership and encrypted device records.
-2. **Android companion app** — background location reporting, battery state and secure commands.
-3. **Live map** — cross-device location updates and location history.
-4. **Recovery actions** — ring, Lost Mode, recovery message and device status.
-5. **Security hardening** — token rotation, rate limits, audit logs and device revocation.
-6. **Production deployment** — monitoring, privacy policy and app-store readiness.
-
-## Run locally
-
-This is a static PWA, so any static server works. For example:
-
-```bash
-python -m http.server 8000
+```text
+┌────────────────────┐       Firebase Auth / Firestore       ┌──────────────────────┐
+│ ReFind Web PWA     │ ◄───────────────────────────────────► │ Android Companion    │
+│ Recovery dashboard │                                       │ Registered phone     │
+│ Login + map        │                                       │ Location service     │
+└────────────────────┘                                       └──────────────────────┘
+          ▲                                                          │
+          └────────────── owner-only device records ─────────────────┘
 ```
 
-Then open `http://localhost:8000` in a browser and allow location access when prompted.
+## Current build
 
-## GitHub Pages
+### Web
+- Responsive recovery dashboard
+- PWA manifest + service worker
+- Browser location prototype
+- Lost Mode UI
+- Recovery-action placeholders
 
-The project can be served directly from the repository's `main` branch once GitHub Pages is enabled.
+### Android companion
+- Native Android project under `android/`
+- Firebase Email/Password authentication
+- Device registration with a stable local device ID
+- Firestore device record
+- Foreground location service
+- Periodic location uploads to the owner's Firestore account
+- Transparent persistent notification while recovery protection is active
+
+### Firebase
+- Owner-only Firestore rules in `firebase/firestore.rules`
+- Backend data model documented in `firebase/README.md`
+- Android configuration template at `android/app/google-services.json.example`
+
+## Important privacy and platform rules
+
+ReFind is designed only for devices owned or explicitly authorized by the account holder. Location access is permission-based and visible to the user.
+
+Android requires explicit location permissions. For ongoing recovery location, the app uses a visible location foreground service. On newer Android versions, background location is subject to additional system permission flows and platform restrictions.
+
+A powered-off phone, a phone with location/connectivity disabled, or a phone whose permissions have been revoked cannot be guaranteed to provide a live location.
+
+## Firebase setup
+
+1. Create a Firebase project.
+2. Enable **Authentication → Email/Password**.
+3. Create **Cloud Firestore**.
+4. Publish `firebase/firestore.rules`.
+5. Register Android package `com.vince.refind`.
+6. Download `google-services.json` and place it at `android/app/google-services.json` locally.
+7. Build and install the Android app.
+
+Do **not** commit Firebase service-account credentials or other server secrets.
+
+## Android build
+
+Open the `android/` directory in Android Studio, add your real `google-services.json`, then build the `app` module.
+
+## Roadmap
+
+- [x] Cross-device backend architecture
+- [x] Android companion foundation
+- [x] Owner authentication
+- [x] Device registration
+- [x] Location reporting foundation
+- [ ] Web Firebase authentication UI
+- [ ] Live map from Firestore
+- [ ] Real-time device status
+- [ ] Secure ring command
+- [ ] Lost Mode synchronization
+- [ ] Location history UI
+- [ ] Battery telemetry
+- [ ] Security hardening, audit logs and production deployment
 
 ## Built by
 
 **Vince Odhiambo** — web developer and technology builder.
 
-> ReFind is intended for recovering devices owned or authorized by the person using the service. It is not designed for covert tracking.
+> ReFind is for recovering devices you own or are authorized to manage. It is not a covert-tracking tool.
