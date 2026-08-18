@@ -40,13 +40,23 @@ class LocationService : Service() {
     private fun pollCommands(){
         try{
             val device=ReFindApi.getDevice(this)
+            ReFindApi.heartbeat(this)
             val requested=device.optString("ringRequestedAt","")
-            if(requested.isNotBlank()&&requested!=lastRingCommand){lastRingCommand=requested;playRing()}
+            val handled=device.optString("ringHandledAt","")
+            if(requested.isNotBlank() && requested!=handled && requested!=lastRingCommand){
+                lastRingCommand=requested
+                playRing()
+                ReFindApi.acknowledgeRing(this,requested)
+            }
         }catch(_:Exception){}
     }
 
     private fun playRing(){
-        try{RingtoneManager.getRingtone(this,RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))?.play()}catch(_:Exception){}
+        try{
+            val ringtone=RingtoneManager.getRingtone(this,RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
+            ringtone?.play()
+            executor.schedule({try{ringtone?.stop()}catch(_:Exception){}},20,TimeUnit.SECONDS)
+        }catch(_:Exception){}
     }
 
     private fun batteryPercent():Int?{
