@@ -1,44 +1,50 @@
-<div align="center">
+# ReFind 📱
 
-# 🧑🏾‍💻 J-TEENS
-### **Youth Technology Project**
+**Find it. Recover it. Protect it.**
 
-![Status](https://img.shields.io/badge/STATUS-IN%20DEVELOPMENT-00FF88?style=for-the-badge)
-![Owner](https://img.shields.io/badge/BUILDER-VINCE%20ODHIAMBO-111111?style=for-the-badge)
+ReFind is a privacy-first lost-device recovery project by **Vince Odhiambo**. The goal is simple: register your own phone before an event, trip, school day or everyday use, then use another device to access a secure recovery dashboard when it goes missing.
 
-**A project workspace for building digital experiences for young people.**
+## Current MVP
 
-</div>
+- Responsive recovery dashboard
+- Device registration flow
+- Browser geolocation permission and latest-location capture
+- Battery information when supported by the browser
+- Lost Mode state
+- Ring/recovery action placeholder for the future companion app
+- PWA manifest, service worker and install prompt
+- Offline-friendly shell
+- Clear security/permission boundaries
 
----
+### Important limitation
 
-## ✦ About
+The current GitHub Pages MVP stores its demo state locally in the browser. A web page cannot reliably locate a separate lost phone by itself, bypass Android/iOS permissions, or locate a powered-off device.
 
-J-Teens is part of Vince's growing collection of youth-focused technology projects. This repository is being developed as the project evolves.
+## Next build phases
 
-## 🧭 Development Goals
+1. **Authenticated cloud backend** — accounts, device ownership and encrypted device records.
+2. **Android companion app** — background location reporting, battery state and secure commands.
+3. **Live map** — cross-device location updates and location history.
+4. **Recovery actions** — ring, Lost Mode, recovery message and device status.
+5. **Security hardening** — token rotation, rate limits, audit logs and device revocation.
+6. **Production deployment** — monitoring, privacy policy and app-store readiness.
 
-- Youth-friendly digital experiences
-- Responsive web interfaces
-- Practical educational / community features
-- Accessible design
-- Responsible technology
+## Run locally
 
-## 🚀 Get Started
+This is a static PWA, so any static server works. For example:
 
 ```bash
-git clone https://github.com/vince551/J-teens.git
-cd J-teens
+python -m http.server 8000
 ```
 
-Use the project files and current development notes as the source of truth for the implementation.
+Then open `http://localhost:8000` in a browser and allow location access when prompted.
 
-## 👨‍💻 Builder
+## GitHub Pages
 
-**Vince Odhiambo**
+The project can be served directly from the repository's `main` branch once GitHub Pages is enabled.
 
-Web developer · technology builder
+## Built by
 
----
+**Vince Odhiambo** — web developer and technology builder.
 
-<p align="center"><sub>Build for young people. Build with purpose.</sub></p>
+> ReFind is intended for recovering devices owned or authorized by the person using the service. It is not designed for covert tracking.
