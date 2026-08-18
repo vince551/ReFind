@@ -31,7 +31,8 @@ object ReFindApi {
     }
     fun updateLocation(ctx: Context, lat: Double, lng: Double, accuracy: Float, battery: Int?) {
         val recordId = deviceId(ctx) ?: return
-        val body = JSONObject().put("lastLatitude", lat).put("lastLongitude", lng).put("lastAccuracy", accuracy).put("lastSeen", java.time.Instant.now().toString())
+        val now = java.time.Instant.now().toString()
+        val body = JSONObject().put("lastLatitude", lat).put("lastLongitude", lng).put("lastAccuracy", accuracy).put("lastSeen", now).put("lastHeartbeat", now)
         if (battery != null) body.put("battery", battery)
         request(ctx, "PATCH", "/api/collections/devices/records/$recordId", body, token(ctx))
         val location = JSONObject().put("device", recordId).put("latitude", lat).put("longitude", lng).put("accuracy", accuracy)
@@ -39,6 +40,14 @@ object ReFindApi {
         request(ctx, "POST", "/api/collections/locations/records", location, token(ctx))
     }
     fun getDevice(ctx: Context): JSONObject = JSONObject(request(ctx, "GET", "/api/collections/devices/records/${deviceId(ctx)}", null, token(ctx)))
+    fun heartbeat(ctx: Context) {
+        val id=deviceId(ctx) ?: return
+        request(ctx,"PATCH","/api/collections/devices/records/$id",JSONObject().put("lastHeartbeat",java.time.Instant.now().toString()),token(ctx))
+    }
+    fun acknowledgeRing(ctx: Context, requestedAt: String) {
+        val id=deviceId(ctx) ?: return
+        request(ctx,"PATCH","/api/collections/devices/records/$id",JSONObject().put("ringHandledAt",java.time.Instant.now().toString()).put("lastCommand","ring_ack").put("lastCommandAt",requestedAt),token(ctx))
+    }
     private fun request(ctx: Context, method: String, path: String, body: JSONObject?, token: String?): String {
         val c = URL(base(ctx) + path).openConnection() as HttpURLConnection
         c.requestMethod = method; c.setRequestProperty("Content-Type", "application/json"); if (!token.isNullOrBlank()) c.setRequestProperty("Authorization", token)
